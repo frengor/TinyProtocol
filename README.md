@@ -15,7 +15,7 @@
 <dependency>
     <groupId>com.frengor</groupId>
     <artifactId>tinyprotocol</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
     <scope>compile</scope>
 </dependency>
 ```
