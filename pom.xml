@@ -7,7 +7,7 @@
     <groupId>com.frengor</groupId>
     <artifactId>tinyprotocol</artifactId>
     <name>TinyProtocol</name>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
