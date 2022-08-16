@@ -19,3 +19,28 @@
     <scope>compile</scope>
 </dependency>
 ```
+
+**It's suggested to shade it:**
+```xml
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-shade-plugin</artifactId>
+    <version>3.3.0</version>
+
+    <configuration>
+        <relocation>
+            <pattern>com.comphenix.tinyprotocol</pattern>
+            <shadedPattern>your.shaded.path.com.comphenix.tinyprotocol</shadedPattern>
+        </relocation>
+    </configuration>
+
+    <executions>
+        <execution>
+            <phase>package</phase>
+            <goals>
+                <goal>shade</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+```
