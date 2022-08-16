@@ -62,7 +62,27 @@ public abstract class TinyProtocol {
 
     // Packets we have to intercept
     private static final Class<?> PACKET_LOGIN_IN_START = Reflection.getMinecraftClass("PacketLoginInStart", "network.protocol.login");
-    private static final FieldAccessor<GameProfile> getGameProfile = Reflection.getField(PACKET_LOGIN_IN_START, GameProfile.class, 0);
+    private static final FieldAccessor<GameProfile> getGameProfile;
+    private static final FieldAccessor<String> getPlayerName;
+
+    static {
+        // In 1.19+ PacketLoginInStart contains only the player's name, not the GameProfile
+        FieldAccessor<GameProfile> tmpGameProfile = null;
+
+        try {
+            tmpGameProfile = Reflection.getField(PACKET_LOGIN_IN_START, GameProfile.class, 0);
+        } catch (Exception ignored) {
+        } finally {
+            getGameProfile = tmpGameProfile;
+        }
+
+        if (getGameProfile == null) {
+            // Get the name if the GameProfile isn't available
+            getPlayerName = Reflection.getField(PACKET_LOGIN_IN_START, String.class, 0);
+        } else {
+            getPlayerName = null;
+        }
+    }
 
     // Speedup channel lookup
     private final Map<String, Channel> channelLookup = new MapMaker().weakValues().makeMap();
@@ -500,8 +520,14 @@ public abstract class TinyProtocol {
 
         private void handleLoginStart(Channel channel, Object packet) {
             if (PACKET_LOGIN_IN_START.isInstance(packet)) {
-                GameProfile profile = getGameProfile.get(packet);
-                channelLookup.put(profile.getName(), channel);
+                if (getGameProfile != null) {
+                    GameProfile profile = getGameProfile.get(packet);
+                    channelLookup.put(profile.getName(), channel);
+                } else if (getPlayerName != null) {
+                    channelLookup.put(getPlayerName.get(packet), channel);
+                } else {
+                    throw new RuntimeException("Unable to find player's name.");
+                }
             }
         }
     }
